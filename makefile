@@ -1,4 +1,4 @@
-#  provided rules are:
+#    provided rules are:
 #    all        builds the main program
 #    test       builds the test program as test_program
 #    clean      removes all files listed if inclusive, or all those which are not code, debug, programs, or explicitely named if exclusive
