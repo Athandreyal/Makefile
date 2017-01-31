@@ -46,11 +46,11 @@
 
 
 #program name
-PROG=asm
+PROG=
 #main module list
-MODULES=asm2.o intWrap.o Mem.o
+MODULES=
 #test module list
-TMODULES=asm2.o intWrap.o asmTest.o Mem.o
+TMODULES=
 #delete method, (IN/EX)CLUSIVE
 DELTYPE=EXCLUSIVE
 #files to be (in/ex)cluded from the delete commands, in/ex depends on line above
@@ -59,6 +59,6 @@ DELOPTFILES=
 DATAPATH=/users/library/csis/comp1633/assignments/a1/
 DATAFILES=
 #special compile flags
-SPECIALFLAGS=-std=c++0x -Ddebug
+SPECIALFLAGS=
 #disabled compile flags
-EXCLUDEFLAGS=-pedantic-errors
+EXCLUDEFLAGS=

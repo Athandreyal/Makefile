@@ -7,7 +7,7 @@
 #    v          runs valgrind on the main program
 #    vt         runs valgrind on the test program
 #    data       copies the files listed in DATAFILES to the current dir, using DATAPATH to find them
-#    update	grabs the current makefile from https://github.com/Athandreyal/Makefile/blob/master/makefile
+#    update	grabs the current makefile from https://github.com/Athandreyal/Makefile/blob/master/makefile   -does not replace modules.mk, ONLY this file
 
 #      _          _   _  ____ _______             _ _ _      _   _     _         __ _ _
 #     | |        | \ | |/ __ \__   __|           | (_) |    | | | |   (_)       / _(_) |
@@ -31,26 +31,17 @@
 #  If you do edit this, update the version list below, and credit yourself as author of that update.
 #
 
-#ver1   author: prenw499, Phillip Renwick, Q1 2016
-#       initial
-#ver2   author: prenw499, Phillip Renwick, Q1 2016
-#       fully modular, filters, substitutions, and entry limited to 9 lines
-#ver 3  author: prenw499, Phillip Renwick, Q1 2016
-#       prevent killing typescripts with clean if you are currently in a typescript
-#ver 4  author: prenw499, Phillip Renwick, Q1 2016
-#       uses external module list, absolves user of costs involved in upgrading to newer versions.
-#ver 5  author: prenw499, Phillip Renwick, Q1 2017
-#       SPECIALFLAGS, EXCLUDEFLAGS added
-#ver 6  author: prenw499, Phillip Renwick, Q1 2017
-#       (IN/EX)CLUSIVE delete is now optional
-#ver 7  author: prenw499, Phillip Renwick, Q1 2017
-#       now auto-clean's when switching from test builds to main builds and vice versa.
-#ver 8  author: prenw499, Phillip Renwick, Q1 2017
-#       fixed the 'test test all' and 'all all test' bug where it would build, clean, then try to link and always fail.
-#ver 9  author: prenw499, Phillip Renwick, Q1 2017
-#	added auto git updating with make update
+#ver1   author: prenw499, Phillip Renwick, Q1 2016      initial
+#ver2   author: prenw499, Phillip Renwick, Q1 2016      fully modular, filters, substitutions, and entry limited to 9 lines
+#ver 3  author: prenw499, Phillip Renwick, Q1 2016      prevent killing typescripts with clean if you are currently in a typescript
+#ver 4  author: prenw499, Phillip Renwick, Q1 2016      uses external module list, absolves user of costs involved in upgrading to newer versions.
+#ver 5  author: prenw499, Phillip Renwick, Q1 2017      SPECIALFLAGS, EXCLUDEFLAGS added
+#ver 6  author: prenw499, Phillip Renwick, Q1 2017      (IN/EX)CLUSIVE delete is now optional
+#ver 7  author: prenw499, Phillip Renwick, Q1 2017      now auto-clean's when switching from test builds to main builds and vice versa.
+#ver 8  author: prenw499, Phillip Renwick, Q1 2017      fixed the 'test test all' and 'all all test' bug where it would build, clean, then try to link and always fail.
+#ver 9  author: prenw499, Phillip Renwick, Q1 2017  	added auto git updating with make update
+#ver10  author: prenw499, Phillip Renwick, Q1 2017	fixed the overly permissive delete exclusion.  No longer avoids test_file when asked not to delete file.
 
- 
 #build specific vars, must be changed for each new program.
 include modules.mk   #must contain PROG, MODULES, TMODULES, DELOPTION, DELOPTIONFILES, FILES, DATAPATH, DATAFILES
 -include submit.mk   #OPTIONAL - may contain submit instruction sets.
@@ -63,6 +54,7 @@ include modules.mk   #must contain PROG, MODULES, TMODULES, DELOPTION, DELOPTION
 
 #static vars, should not need editing.
 PROTECTCODE=cpp h makefile mk mm mt
+PROTECTCODEFILES=makefile
 PROTECTDEBUG= gcov gcno gcda
 PROTECTPROG= $(PROG) test_$(PROG)
 CPPFLAGS=-ansi -pedantic-errors -Wall -Wconversion -MD
@@ -76,7 +68,7 @@ MAINLAST=
 
 #ensures that typescripts are ALWAYS protected when in script session
 ifeq ($(TOKEN),$(TERM))
-PROTECTFILES:=$(PROTECTFILES) typescript
+PROTECTCODEFILES:=$(PROTECTCODEFILES) typescript
 endif
 
 ifeq ($(shell test -e ".mt" && echo -n yes),yes)
@@ -125,14 +117,14 @@ mm:
 	@rm -f .mt	#building main, remove the .mt file that tracks test builds
 	@echo "" > .mm  #building main, place the .mm file that tracks main builds
 
-
-
 #clean which ignores protected CODE, FILES, DEBUG, PROGRrams, and directories.
 #   or which only kills listed files.
-clean:PROTECT=$(filter-out 'xxxxx', $(PROTECTCODE) $(PROTECTDEBUG) $(PROTECTPROG) $(DELOPTFILES))
+clean:PROTECT=$(filter-out 'xxxxx', $(PROTECTCODE) $(PROTECTDEBUG))
+clean:PROTECTEDCODEFILES:=$(filter-out 'xxxxx', $(POTECTEDCODEFILES) $(PROTECTPROG) $(DELOPTFILES))
 clean:PROTECTED=$(subst $(space),\|,$(PROTECT))
+clean:PROTECTEDFILES=$(subst $(space),\|,$(PROTECTEDCODEFILES))
 clean:
-	$(if $(filter $(DELCMPTYPE), $(DELTYPE)),find . -maxdepth 1 ! -perm /a=x -type f ! -iregex '.*\($(PROTECTED)\)' | xargs rm -f;,rm -f $(DELOPTFILES))
+	$(if $(filter $(DELCMPTYPE), $(DELTYPE)),find . -maxdepth 1 ! -perm /a=x -type f ! -iregex '.*\($(PROTECTED)\)' ! -iregex './\($(PROTECTEDFILES)\)' | xargs rm -f;,rm -f $(DELOPTFILES))
 
 #clean specific to removing unnecessary directories from current directory list
 cleanDir:DIRS=$(shell find . -mindepth 1 -maxdepth 1 -type d)
@@ -140,11 +132,13 @@ cleanDir:
 	$(if $(filter $(DELCMPTYPE), $(DELTYPE)),$(foreach var,$(DIRS), rm -r -i $(var);),@echo "Will not delete directories while performing inclusve delete")
 
 #full clean of directory, if exclusive, this will also ask to kill child directories
-cleanAll:PROTECT=$(filter-out 'xxxxx', $(PROTECTCODE) $(DELOPTFILES))
+cleanAll:PROTECT=$(filter-out 'xxxxx', $(PROTECTCODE))
+cleanAll:PROTECTEDCODEFILES:=$(filter-out 'xxxxx', $(POTECTEDCODEFILES) $(DELOPTFILES))
 cleanAll:PROTECTED=$(subst $(space),\|,$(PROTECT))
+cleanAll:PROTECTEDFILES=$(subst $(space),\|,$(PROTECTEDCODEFILES))
 cleanAll:DIRS=$(shell find . -mindepth 1 -maxdepth 1 -type d)
 cleanAll:
-	$(if $(filter $(DELCMPTYPE), $(DELTYPE)),find . -maxdepth 1 -type f ! -iregex '.*\($(PROTECTED)\)' | xargs rm -f;,rm -f $(DELOPTFILES))
+	$(if $(filter $(DELCMPTYPE), $(DELTYPE)),find . -maxdepth 1 -type f ! -iregex '.*\($(PROTECTED)\)' ! -iregex './\($(PROTECTEDFILES)\)' | xargs rm -f;,rm -f $(DELOPTFILES))
 	$(if $(filter $(DELCMPTYPE), $(DELTYPE)),$(foreach var,$(DIRS), rm -r -i $(var);),@echo -n "")
 
 #runs valgrind on program or test_program
