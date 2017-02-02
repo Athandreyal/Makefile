@@ -152,5 +152,6 @@ data:
 	$(foreach var,$(DATAFILES),cp $(DATAPATH)$(var) .;)
 
 update:
-	@echo rm -f makefile   #don't need to show, kill current because we asked for latest
-	wget https://github.com/Athandreyal/Makefile/blob/master/makefile
+	@$(shell echo rm -f makefile)   #don't need to show, kill current because we asked for latest
+	wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/makefile
+
