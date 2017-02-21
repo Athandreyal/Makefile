@@ -52,10 +52,10 @@ include modules.mk   #must contain PROG, MODULES, TMODULES, DELOPTION, DELOPTION
 #       imediately apparent.
 
 #static vars, should not need editing.
-PROTECTCODE=cpp h makefile mk mm mt
+PROTECTCODE=cpp h mk mm mt
 PROTECTCODEFILES=makefile
-PROTECTDEBUG= gcov gcno gcda
-PROTECTPROG= $(PROG) test_$(PROG)
+PROTECTDEBUG=gcov gcno gcda
+PROTECTPROG=$(PROG) test_$(PROG)
 CPPFLAGS=-ansi -pedantic-errors -Wall -Wconversion -MD
 SHELL=/bin/bash -O extglob -c #run make in bash, not sh, makes life much simpler.
 empty=
@@ -67,7 +67,7 @@ MAINLAST=
 
 #ensures that typescripts are ALWAYS protected when in script session
 ifeq ($(TOKEN),$(TERM))
-PROTECTCODE:=$(PROTECTCODE) typescript
+PROTECTCODEFILES:=$(PROTECTCODEFILES) typescript
 endif
 
 ifeq ($(shell test -e ".mt" && echo -n yes),yes)
@@ -119,10 +119,12 @@ mm:
 #clean which ignores protected CODE, FILES, DEBUG, PROGRrams, and directories.
 #   or which only kills listed files.
 clean:PROTECT=$(filter-out 'xxxxx', $(PROTECTCODE) $(PROTECTDEBUG))
-clean:PROTECTEDCODEFILES:=$(filter-out 'xxxxx', $(POTECTEDCODEFILES) $(PROTECTPROG) $(DELOPTFILES))
+clean:PROTECTEDCODEFILES:=$(filter-out 'xxxxx', $(PROTECTCODEFILES) $(PROTECTPROG) $(DELOPTFILES))
 clean:PROTECTED=$(subst $(space),\|,$(PROTECT))
+clean:PROTECTEDTEST:=$(PROTECTEDCODEFILES)
 clean:PROTECTEDFILES=$(subst $(space),\|,$(PROTECTEDCODEFILES))
-clean:
+clean:	#if exclusive                               if typescript file exists                          if typescript not protected               mention it
+	$(if $(filter $(DELCMPTYPE), $(DELTYPE)),$(if $(shell test -e "typescript" && echo -n yes),$(if $(filter typescript, $(PROTECTEDTEST)),@echo "clean: Typescript protected",$(call __TYPESCRIPT_WARN__))))
 	$(if $(filter $(DELCMPTYPE), $(DELTYPE)),find . -maxdepth 1 ! -perm /a=x -type f ! -iregex '.*\($(PROTECTED)\)' ! -iregex './\($(PROTECTEDFILES)\)' | xargs rm -f;,rm -f $(DELOPTFILES))
 
 #clean specific to removing unnecessary directories from current directory list
@@ -132,11 +134,13 @@ cleanDir:
 
 #full clean of directory, if exclusive, this will also ask to kill child directories
 cleanAll:PROTECT=$(filter-out 'xxxxx', $(PROTECTCODE))
-cleanAll:PROTECTEDCODEFILES:=$(filter-out 'xxxxx', $(POTECTEDCODEFILES) $(DELOPTFILES))
+cleanAll:PROTECTEDCODEFILES:=$(filter-out 'xxxxx', $(PROTECTCODEFILES) $(DELOPTFILES))
+cleanAll:PROTECTEDTEST:=$(PROTECTEDCODEFILES)
 cleanAll:PROTECTED=$(subst $(space),\|,$(PROTECT))
 cleanAll:PROTECTEDFILES=$(subst $(space),\|,$(PROTECTEDCODEFILES))
 cleanAll:DIRS=$(shell find . -mindepth 1 -maxdepth 1 -type d)
 cleanAll:
+	$(if $(filter $(DELCMPTYPE), $(DELTYPE)),$(if $(shell test -e "typescript" && echo -n yes),$(if $(filter typescript, $(PROTECTEDTEST)),@echo "clean: Typescript protected",$(call __TYPESCRIPT_WARN__))))
 	$(if $(filter $(DELCMPTYPE), $(DELTYPE)),find . -maxdepth 1 -type f ! -iregex '.*\($(PROTECTED)\)' ! -iregex './\($(PROTECTEDFILES)\)' | xargs rm -f;,rm -f $(DELOPTFILES))
 	$(if $(filter $(DELCMPTYPE), $(DELTYPE)),$(foreach var,$(DIRS), rm -r -i $(var);),@echo -n "")
 
@@ -153,4 +157,12 @@ data:
 update:
 	@$(shell echo rm -f makefile)   #don't need to show, kill current because we asked for latest
 	wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/makefile
+
+define __TYPESCRIPT_WARN__
+	@echo ""
+	@echo "================================"
+	@echo "     typescript eliminated!"
+	@echo "================================"
+	@echo ""
+endef
 
