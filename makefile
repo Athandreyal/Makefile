@@ -30,8 +30,8 @@
 #  If you do edit this, update the version list below, and credit yourself as author of that update.
 #
 
-#ver1   author: prenw499, Phillip Renwick, Q1 2016      initial
-#ver2   author: prenw499, Phillip Renwick, Q1 2016      fully modular, filters, substitutions, and entry limited to 9 lines
+#ver 1  author: prenw499, Phillip Renwick, Q1 2016      initial
+#ver 2  author: prenw499, Phillip Renwick, Q1 2016      fully modular, filters, substitutions, and entry limited to 9 lines
 #ver 3  author: prenw499, Phillip Renwick, Q1 2016      prevent killing typescripts with clean if you are currently in a typescript
 #ver 4  author: prenw499, Phillip Renwick, Q1 2016      uses external module list, absolves user of costs involved in upgrading to newer versions.
 #ver 5  author: prenw499, Phillip Renwick, Q1 2017      SPECIALFLAGS, EXCLUDEFLAGS added
