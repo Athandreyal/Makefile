@@ -1,0 +1,151 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.9.9)  17 DEC 2016 20:30
+entering extended mode
+**./a1.tex
+(a1.tex
+LaTeX2e <2016/03/31> patch level 3
+Babel <3.9r> and hyphenation patterns for 75 language(s) loaded.
+(C:\Software\MiKTeX\tex\latex\base\article.cls
+Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
+(C:\Software\MiKTeX\tex\latex\base\size12.clo
+File: size12.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(C:\Software\MiKTeX\tex\latex\cancel\cancel.sty
+Package: cancel 2013/04/12 v2.2 Cancel math terms
+)
+(C:\Software\MiKTeX\tex\latex\amscls\amsthm.sty
+Package: amsthm 2015/03/04 v2.20.2
+\thm@style=\toks14
+\thm@bodyfont=\toks15
+\thm@headfont=\toks16
+\thm@notefont=\toks17
+\thm@headpunct=\toks18
+\thm@preskip=\skip43
+\thm@postskip=\skip44
+\thm@headsep=\skip45
+\dth@everypar=\toks19
+) (a1.aux)
+\openout1 = `a1.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 16.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 16.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 16.
+
+Underfull \hbox (badness 10000) in paragraph at lines 16--18
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 16--18
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 16--18
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 19--51
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 19--51
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 19--51
+
+ []
+
+[1
+
+{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}]
+Underfull \hbox (badness 10000) in paragraph at lines 53--65
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 53--65
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 53--65
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 66--71
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 72--76
+
+ []
+
+[2]
+Underfull \hbox (badness 10000) in paragraph at lines 77--78
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 80--81
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 80--81
+
+ []
+
+[3] (a1.aux) ) 
+Here is how much of TeX's memory you used:
+ 356 strings out of 493334
+ 3767 string characters out of 3143147
+ 58025 words of memory out of 3000000
+ 3953 multiletter control sequences out of 15000+200000
+ 7289 words of font info for 26 fonts, out of 3000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 22i,4n,19p,206b,102s stack positions out of 5000i,500n,10000p,200000b,50000s
+<C:/Software/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:
+/Software/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Software/MiKTeX/
+fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Software/MiKTeX/fonts/type1/public
+/amsfonts/cm/cmr12.pfb><C:/Software/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.
+pfb><C:/Software/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Software/
+MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
+Output written on a1.pdf (3 pages, 85586 bytes).
+PDF statistics:
+ 40 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+
