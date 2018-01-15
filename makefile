@@ -118,12 +118,13 @@ $(DPROG):test
 #test build rules, redefines GTFLAGS and LDFLAGS to testing purposes.
 #calls gcov on intended code when completed.
 test:$(if $(MAINLAST),clean)
-test:BUILDFLAGS=$(CPPFLAGS) $(CXXFLAGS) $(GTFLAG) $(LDFLAG)  #one list of flags
-test:BUILDFLAGS:=$(filter-out $(EXCLUDEFLAGS),$(BUILDFLAGS))  #filter out excluded flags
+test:CPPFLAGS=$(CPPFLAGS) $(CXXFLAGS) $(GTFLAG) $(LDFLAG)  #one list of flags
+test:CPPFLAGS:=$(filter-out $(EXCLUDEFLAGS),$(CPPFLAGS))  #filter out excluded flags
 test:$(DMODULES)
-test:GCOV=$(if $(GCOV_MODULES),$(GCOV_MODULES),$(filter $(MODULES:.o=.cpp), $(DMODULES:.o=.cpp)))
+test:GCOV=$(if $(GCOV_MODULES),$(GCOV_MODULES),$(filter $(MODULES), $(DMODULES)))
+test:GCOV=$(GCOV:.o=.cpp)
 test:mt
-	g++ $(BUILDFLAGS) $(DMODULES) -g -o $(DEBUG_PREFIX)$(PROG)
+	g++ $(CPPFLAGS) $(DMODULES) -g -o $(DEBUG_PREFIX)$(PROG)
 	$(if $(EXECUTE_DEBUG_ON_BUILD),$(DEBUG_PREFIX)$(PROG))
 	$(if $(GCOV_DEBUG_ON_BUILD),$(foreach var,$(GCOV), gcov $(var) 2> /dev/null | grep -A 1 $(var);))
 
