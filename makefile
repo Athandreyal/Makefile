@@ -35,7 +35,11 @@
 #       2) Modify it as you see fit, abuse and use.  Update the version history if you do so, so that those after you can give credit where due.
 
 
-include modules.mk   #must contain PROG, MODULES, TMODULES, DELOPTION, DELOPTIONFILES, FILES, DATAPATH, DATAFILES
+ifneq ($(MAKECMDGOALS),update)
+ifneq ($(MAKECMDGOALS),setup)
+include modules.mk
+endif
+endif
 -include submit.mk   #OPTIONAL - may contain submit instruction sets.
 #to add in more modules use include.  include comes in two forms.
 #       include is requisite, the file must exist or it will fail.
