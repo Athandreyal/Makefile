@@ -14,7 +14,7 @@
 #    update     grabs the current makefile from
 #               https://github.com/Athandreyal/Makefile/blob/master/makefile
 #               -does not replace modules.mk, ONLY this file
-#    setup      grabs the related modules.mk file from
+#    setup      grabs the related modules.mk file from, you need this, its not optional
 #               https://github.com/Athandreyal/Makefile/blob/master/modules.mk
 #
 
@@ -164,7 +164,7 @@ update:
 	@$(shell echo rm -f makefile)   #kill current because we asked for latest
 	wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/makefile
 
-update:
+setup:
 	@$(shell echo rm -f modules.mk)   #kill current because we asked for latest
 	wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/modules.mk
 
