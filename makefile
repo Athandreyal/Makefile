@@ -107,7 +107,7 @@ all:BUILDFLAGS=$(CPPFLAGS) $(CXXFLAGS) #one list of flags
 all:BUILDFLAGS:=$(filter-out $(EXCLUDEFLAGS),$(BUILDFLAGS))  #filter out excluded flags
 all:$(MODULES)
 all:mm
-        g++  $(BUILDFLAGS) $(MODULES) -o $(PROG)
+	g++  $(BUILDFLAGS) $(MODULES) -o $(PROG)
 
 $(DPROG):test
 
@@ -119,9 +119,9 @@ test:BUILDFLAGS:=$(filter-out $(EXCLUDEFLAGS),$(BUILDFLAGS))  #filter out exclud
 test:$(DMODULES)
 test:GCOV=$(if $(GCOV_MODULES),$(GCOV_MODULES),$(filter $(MODULES:.o=.cpp), $(DMODULES:.o=.cpp)))
 test:mt
-        g++ $(BUILDFLAGS) $(DMODULES) -g -o $(DEBUG_PREFIX)$(PROG)
-        $(if $(EXECUTE_DEBUG_ON_BUILD),$(DEBUG_PREFIX)$(PROG))
-        $(if $(GCOV_DEBUG_ON_BUILD),$(foreach var,$(GCOV), gcov $(var) 2> /dev/null | grep -A 1 $(var);))
+	g++ $(BUILDFLAGS) $(DMODULES) -g -o $(DEBUG_PREFIX)$(PROG)
+	$(if $(EXECUTE_DEBUG_ON_BUILD),$(DEBUG_PREFIX)$(PROG))
+	$(if $(GCOV_DEBUG_ON_BUILD),$(foreach var,$(GCOV), gcov $(var) 2> /dev/null | grep -A 1 $(var);))
 
 #used to determine if I last built test, or main, shoud clean first if building other else use built files as is
 mt:     @touch .mt      #building test, place the .mt file that tracks test builds
@@ -135,11 +135,11 @@ clean:PROTECTED=$(subst $(space),\|,$(PROTECT))
 clean:PROTECTEDTEST:=$(PROTECTEDCODEFILES)
 clean:PROTECTEDFILES=$(subst $(space),\|,$(PROTECTEDCODEFILES))
 clean:
-        $(call evalClean,_)
+	$(call evalClean,_)
 
 #clean specific to removing unnecessary directories from current directory list
 cleanDir:
-        $(call evalClean,Dir)
+	$(call evalClean,Dir)
 
 #full clean of directory, if exclusive, this will also ask to kill child directories
 cleanAll:PROTECT=$(filter-out 'xxxxx', $(PROTECTCODE))
@@ -152,28 +152,28 @@ cleanAll:clean cleanDir
 
 #runs valgrind on program or test_program
 v:$(PROG)
-        valgrind $(VALGRINDFLAGS) $(PROG)
+	valgrind $(VALGRINDFLAGS) $(PROG)
 vt:$(DPROG)
-        valgrind $(VALGRIND_FLAGS) $(DPROG)
+	valgrind $(VALGRIND_FLAGS) $(DPROG)
 
 #copies datafiles from target directory
 data:
-        $(foreach var,$(DATAFILES),cp $(DATAPATH)$(var) .;)
+	$(foreach var,$(DATAFILES),cp $(DATAPATH)$(var) .;)
 
 update:
-        @$(shell echo rm -f makefile)   #kill current because we asked for latest
-        wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/makefile
+	@$(shell echo rm -f makefile)   #kill current because we asked for latest
+	wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/makefile
 
 update:
-        @$(shell echo rm -f modules.mk)   #kill current because we asked for latest
-        wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/modules.mk
+	@$(shell echo rm -f modules.mk)   #kill current because we asked for latest
+	wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/modules.mk
 
 # cleaning stuff
 
 #expands based on the clean type, and option type, to call the appropriate clean rule
 define evalClean
-        @rm -f .moduleScript.sh
-        $(call doClean$1$(if $(call TestDelType),Exclude,Include))
+	@rm -f .moduleScript.sh
+	$(call doClean$1$(if $(call TestDelType),Exclude,Include))
 endef
 
 doClean_Exclude=$(call doTypeScriptWarn) rm -f $(shell find . -maxdepth 1 -type f ! -iregex '.*\($(PROTECTED)\)' ! -iregex './\($(PROTECTEDFILES)\)')
@@ -187,46 +187,46 @@ doCleanDirInclude=@echo "Will not delete directories while performing inclusive 
 doTypeScriptWarn=$(if $(shell test -e "typescript" && echo -n yes),$(if $(filter typescript, $(PROTECTEDTEST)),@echo "clean: Typescript protected";,$(call __TYPESCRIPT_WARN__);))
 
 define __TYPESCRIPT_WARN__
-        @echo ""
-        @echo "================================"
-        @echo "     typescript eliminated!"
-        @echo "================================"
-        @echo ""
+	@echo ""
+	@echo "================================"
+	@echo "     typescript eliminated!"
+	@echo "================================"
+	@echo ""
 endef
 
 define TestDelType
-        $(filter $(DELCMPTYPE), $(DELTYPE))
+	$(filter $(DELCMPTYPE), $(DELTYPE))
 endef
 
 .mainModuleList:.moduleScript.sh
-        @echo "auto-generating module list for $(PROG)"
-        @echo ".mainModuleList" > targets
-        @echo "int.main" >> targets
-        @echo "MODULES" >> targets
-        @./.moduleScript.sh
-        @rm targets
+	@echo "auto-generating module list for $(PROG)"
+	@echo ".mainModuleList" > targets
+	@echo "int.main" >> targets
+	@echo "MODULES" >> targets
+	@./.moduleScript.sh
+	@rm targets
 
 .debugModuleList:.moduleScript.sh
-        @echo "auto-generating module list for $(DPROG)"
-        @echo ".debugModuleList" > targets
-        @echo "gtest/gtest.h" >> targets
-        @echo "DMODULES" >> targets
-        @./.moduleScript.sh
-        @rm targets
+	@echo "auto-generating module list for $(DPROG)"
+	@echo ".debugModuleList" > targets
+	@echo "gtest/gtest.h" >> targets
+	@echo "DMODULES" >> targets
+	@./.moduleScript.sh
+	@rm targets
 
 .moduleScript.sh:makefile
-        @echo -e $(value getModuleScript) > ./.moduleScript.sh
-        @chmod 777 ./.moduleScript.sh
+	@echo -e $(value getModuleScript) > ./.moduleScript.sh
+	@chmod 777 ./.moduleScript.sh
 
 getModuleScript="\#!/bin/bash\n\
 query=''\n\
 targets=''\n\
 modules=''\n\
 if [ -f ./targets ];then\n\
-        readarray arr < targets\n\
-        query=\${arr[1]}\n\
-        target=\${arr[0]}\n\
-        modules=\${arr[2]}\n\
+	readarray arr < targets\n\
+	query=\${arr[1]}\n\
+	target=\${arr[0]}\n\
+	modules=\${arr[2]}\n\
 fi\n\
 checked=''\n\
 modules=\"\$modules=\"\n\
@@ -235,32 +235,32 @@ files=\$(find . -maxdepth 1 -type f -printf '%f ')\n\
 function getReq2 {\n\
     fileName=\$1\n\
     if [[ \$checked != *\"\$fileName\"* ]];then\n\
-        checked+=\$fileName' '\n\
-        includes=\$(grep '\#include \"*\"' \$fileName | awk '{x=length(\$0)-11;y=substr(\$0,11,x);print y}')\n\
-        for file in \$includes\n\
-        do\n\
-            if [[ files == *\"file\"* ]];then\n\
-                tocheck+=(\$file)\n\
-            fi\n\
-        done\n\
-        moduleName=\$(nameAsModule \$fileName)\n\
-        if [[ \$modules != *\"\$moduleName\"* ]];then\n\
-            modules+=\"\$moduleName \"\n\
-        fi\n\
+	checked+=\$fileName' '\n\
+	includes=\$(grep '\#include \"*\"' \$fileName | awk '{x=length(\$0)-11;y=substr(\$0,11,x);print y}')\n\
+	for file in \$includes\n\
+	do\n\
+	    if [[ files == *\"file\"* ]];then\n\
+		tocheck+=(\$file)\n\
+	    fi\n\
+	done\n\
+	moduleName=\$(nameAsModule \$fileName)\n\
+	if [[ \$modules != *\"\$moduleName\"* ]];then\n\
+	    modules+=\"\$moduleName \"\n\
+	fi\n\
     fi\n\
 }\n\
 function nameAsModule {\n\
     file=\$1\n\
     if [[ \$file == *'.cpp' ]];then\n\
-        moduleName=\${file/'.cpp'/'.o'}\n\
+	moduleName=\${file/'.cpp'/'.o'}\n\
     elif [[ \$file == *'.h' ]];then\n\
-        o_name=\${file/'.h'/'.o'}\n\
-        c_name=\${file/'.h'/'.cpp'}\n\
-        if [[ \$files == *\"\$o_name\"* ]];then\n\
-                moduleName=\${file/'.h'/'.o'}\n\
-        elif [[ \$files == *\"\$c_name\"* ]];then\n\
-                moduleName=\${file/'.h'/'.o'}\n\
-        fi\n\
+	o_name=\${file/'.h'/'.o'}\n\
+	c_name=\${file/'.h'/'.cpp'}\n\
+	if [[ \$files == *\"\$o_name\"* ]];then\n\
+		moduleName=\${file/'.h'/'.o'}\n\
+	elif [[ \$files == *\"\$c_name\"* ]];then\n\
+		moduleName=\${file/'.h'/'.o'}\n\
+	fi\n\
     fi\n\
     echo \$moduleName' '\n\
 }\n\
