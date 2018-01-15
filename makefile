@@ -14,6 +14,9 @@
 #    update     grabs the current makefile from
 #               https://github.com/Athandreyal/Makefile/blob/master/makefile
 #               -does not replace modules.mk, ONLY this file
+#    setup      grabs the related modules.mk file from
+#               https://github.com/Athandreyal/Makefile/blob/master/modules.mk
+#
 
 #      _          _   _  ____ _______             _ _ _      _   _     _         __ _ _
 #     | |        | \ | |/ __ \__   __|           | (_) |    | | | |   (_)       / _(_) |
@@ -160,6 +163,10 @@ data:
 update:
         @$(shell echo rm -f makefile)   #kill current because we asked for latest
         wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/makefile
+
+update:
+        @$(shell echo rm -f modules.mk)   #kill current because we asked for latest
+        wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/modules.mk
 
 # cleaning stuff
 
