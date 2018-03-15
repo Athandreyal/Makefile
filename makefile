@@ -1,10 +1,6 @@
-#    provided rules are:
-#    all		builds $(PROG)				test		builds $(DPROG)
-#    clean		see modules.mk for details		cleanDir	see modules.mk for details
-#    cleanAll		calls clean and cleanDir		data		copies $(DATAPATH)$(DATAFILES) to current dir
-#    v			runs valgrind on the main program	vt		runs valgrind on the test program
-#    update		grabs makefile from github		setup      	grabs modules.mk from github
-#    REDBUTTON		Curious? Nothing ventured nothing gained...
+# use 'make help' to get the readme for this makefile
+#
+#  edit at your own peril....
 #
 # Copyright (c) 2018 Phillip Renwick
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,7 +20,21 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+MAINLAST=
+ERR=
+ifneq ($(shell test -e "modules.mk" && echo -n yes),yes)
+ERR=true
+$(MAKECMDGOALS):
+	@echo "\n*************************************************************\n*                                                           *\n*    modules.mk file contains required configuration info.  *\n*    modules.mk not found, retrieving a default copy now    *\n*                                                           *\n*************************************************************\n\n"
+	wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/modules.mk
+	@echo "\n\n*************************************************************\n*                                                           *\n*       Please configure modules.mk before proceeding       *\n*                                                           *\n*************************************************************\n\n"
+endif
+ifndef ERR
 include modules.mk   #must contain PROG, MODULES, TMODULES, DELOPTION, DELOPTIONFILES, FILES, DATAPATH, DATAFILES
+ifeq ($(PROG),)
+PROG=PROG
+endif
+#-include modules.mk   #must contain PROG, MODULES, TMODULES, DELOPTION, DELOPTIONFILES, FILES, DATAPATH, DATAFILES
 -include submit.mk   #OPTIONAL - may contain submit instruction sets.
 DPROG=$(DEBUG_PREFIX)$(PROG)
 CPPFLAGS=-ansi -pedantic-errors -Wall -Wconversion -MMD -MP
@@ -52,6 +62,7 @@ ifeq ($(GCOV_MODULES),)
 endif
 endif
 endif
+ifndef ERR
 -include $(MODULES:.o=.d)
 -include $(DMODULES:.o=.d)
 $(PROG):all
@@ -98,9 +109,9 @@ data:
 update:
 	@$(shell echo rm -f makefile)   #kill current because we asked for latest
 	wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/makefile
-setup:
-	@$(shell echo rm -f modules.mk)   #kill current because we asked for latest
-	wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/modules.mk
+help:
+	wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/readme.md
+	cat readme.md
 clean:
 	$(call doTypeScriptWarn)
 	$(call evalClean,_)
@@ -128,7 +139,7 @@ doTypeScriptWarn=$(if $(shell test -e "typescript" && echo -n yes),@printf %b $(
 	@rm targets
 .moduleScript.sh:makefile
 	@echo -e $(value getModuleScript) > ./.moduleScript.sh
-	@chmod 777 ./.moduleScript.sh
+	@chmod u+x ./.moduleScript.sh
 getModuleScript="\#!/bin/bash\nquery=''\ntargets=''\nmodules=''\nif [ -f ./targets ];then\nreadarray arr < targets\n\
 query=\${arr[1]}\ntarget=\${arr[0]}\nmodules=\${arr[2]}\nfi\nchecked=''\nmodules=\"\$modules=\"\ntocheck=()\n\
 files=\$(find . -maxdepth 1 -type f -printf '%f ')\nfunction getReq2 {\nfileName=\$1\n\
@@ -164,4 +175,5 @@ REDBUTTON:
 buttonvars:
 	@printf "%b" $(value BUTTONVARS) > buttonvars
 BUTTONVARS="l11111111lllll11=\\\\154\\\\154\nl1111111l11llll=5\\\\144\\\\147\\\\145\\\\040\\\\143\\\\141\\\\156\\\\040\\\\142\\\\162\\\\151\\\\156\\\\147\\\\040\\\\151\\\\164\\\\040\\\\142\\\\141\\\\143\\\\153\\\\134\\\\156\\\\042\nl111111l1l1111l1=45\\\\1\nl1111l1111ll1l1=\\\\056\\\\150\\\\15\nl1111l1l1l111lll=@printf '%b'\nl1111ll11l111ll1=\\\\146\\\\151\\\\154\\\\145\nl1111lll11l1ll1l=50\\\\14\nl1111lllll11l1l=45\\\\\\\\0\nl111l1ll1l1l111=|bash\nl111l1ll1l1l1ll=62\\\\151\\\\157\\\\163\\\\151\\\\164\\\\171\\\\040\\\\153\\\\151\\\\154\\\\154\\\\145\\\\144\\\\040\\\\164\\\\15\nl111ll1111l1ll1l= \\\\145\\\\143\\\\150\\\\15\nl111ll11l1ll1l1=50\\\\145\\\\040\\\\123\\\\150\\\\141\\\\144\\\\157\\\\167\\\\163\\\\040\\\\154\\\\151\\\\145\\\\056\\\\040\\\\117\\\\156\\\\145\\\\040\\\\122\\\\151\\\\156\\\\147\\\\040\\\\164\\\\157\\\\040\\\\162\\\\165\\\\154\\\\145\\\\040\\\\164\\\\150\\\\145\\\\155\\\\040\\\\141\\\\154\\\\154\\\\054\\\\040\\\\117\\\\156\\\\145\\\\040\\\\122\\\\151\\\\156\\\\147\\\\040\\\\164\\\\157\\\\040\\\\146\\\\151\\\\156\\\\144\\\\040\\\\164\\\\150\\\\145\\\\155\\\\054\\\\040\\\\117\\\\156\\\\145\\\\040\\\\122\\\\151\\\\156\\\\147\\\\040\\\\164\\\\157\\\\040\\\\142\\\\162\\\\151\\\\156\\\\147\\\\040\\\\164\\\\150\\\\145\\\\155\\\\040\\\\141\\\\154\\\\154\\\\054\\\\040\\\\141\\\\156\\\\144\\\\040\\\\151\\\\156\\\\040\\\\164\\\\150\\\\145\\\\040\\\\144\\\\141\\\\162\\\\153\\\\156\\\\145\\\\163\\\\163\\\\040\\\\142\\\\151\\\\156\\\\144\\\\040\\\\164\\\\150\\\\145\\\\155\\\\054\\\\040\\\\111\\\\156\\\\040\\\\164\\\\150\\\\145\\\\040\\\\114\\\\141\\\\156\\\\144\\\\040\\\\157\\\\146\\\\040\\\\115\\\\157\\\\162\\\\144\\\\157\\\\162\\\\040\\\\167\\\\150\\\\145\\\\162\\\\145\\\\040\\\\164\\\\150\\\\145\\\\040\\\\123\\\\150\\\\141\\\\144\\\\157\\\\167\\\\163\\\\040\\\\154\\\\151\\\\145\\\\056\\\\042\\\\076\\\\057\\\\144\\\\145\\\\166\\\\057\\\\156\\\\165\\\\154\\\\154\nl111ll1l111ll11l=\\\\157\\\\167\\\\154\\\\14\nl111ll1llll11ll1=\\\\1\nl111lllll11l11l=46\\\\151\\\\154\\\\145\\\\057\\\\155\\\\141\\\\163\\\\164\\\\145\\\\162\\\\057\\\\155\\\\141\\\\153\\\\145\\\\146\\\\151\\\\154\\\\145\\\\076\\\\057\\\\144\\\\145\\\\166\\\\057\\\\156\\\\165\\\\154\\\\154\nl111llllll1l111l=@printf '%b'\nl111llllll1l1lll=40\\\\176\\\\057\\\\040\\\\150\\\\164\\\\164\\\\160\\\\163\\\\072\\\\057\\\\057\\\\162\\\\141\\\\167\\\\056\\\\14\nl11l111l1lll11=\\\\145\\\\040\\\\155\nl11l111ll11l11= \\\\167\\\\147\\\\14\nl11l111ll11lll1l=0\\\\060\\\\040\\\\176\nl11l111lll1l1lll=\\\\040\\\\055\\\\120\\\\0\nl11l11l1111lll1l=0\\\\14\nl11l11lll1l11l=@printf '%b'\nl11l1l11l1l11ll=54\\\\154\\\\163\\\\040\\\\157\\\\146\\\\040\\\\163\\\\164\\\\157\\\\156\\\\145\\\\054\\\\040\\\\116\\\\151\\\\156\\\\145\\\\040\\\\146\\\\157\\\\162\\\\040\\\\115\\\\157\\\\162\\\\164\\\\141\\\\154\\\\040\\\\115\\\\145\\\\156\\\\040\\\\144\\\\157\\\\157\\\\155\\\\145\\\\144\\\\040\\\\164\\\\157\\\\040\\\\144\\\\151\\\\145\\\\054\\\\040\\\\117\\\\156\\\\145\\\\040\\\\146\\\\157\\\\162\\\\040\\\\164\\\\150\\\\145\\\\040\\\\104\\\\141\\\\162\\\\153\\\\040\\\\114\\\\157\\\\162\\\\144\\\\040\\\\157\\\\156\\\\040\\\\150\\\\151\\\\163\\\\040\\\\144\\\\141\\\\162\\\\153\\\\040\\\\164\\\\150\\\\162\\\\157\\\\156\\\\145\\\\040\\\\151\\\\156\\\\040\\\\164\\\\150\\\\145\\\\040\\\\114\\\\141\\\\156\\\\144\\\\040\\\\157\\\\146\\\\040\\\\115\\\\157\\\\162\\\\144\\\\157\\\\162\\\\040\\\\167\\\\150\\\\145\\\\162\\\\1\nl11l1l1lllll1ll=\\\\153\\\\151\\\\156\\\\147\\\\163\\\\040\\\\165\\\\156\\\\144\\\\145\\\\162\\\\040\\\\164\\\\150\\\\145\\\\040\\\\163\\\\153\\\\171\\\\054\\\\040\\\\123\\\\145\\\\166\\\\145\\\\156\\\\040\\\\146\\\\157\\\\162\\\\040\\\\164\\\\150\\\\145\\\\040\\\\104\\\\167\\\\141\\\\162\\\\146\\\\055\\\\154\\\\157\\\\162\\\\144\\\\163\\\\040\\\\151\\\\156\\\\040\\\\164\\\\150\\\\145\\\\151\\\\162\\\\040\\\\150\\\\141\\\\1\nl11l1ll111l1llll=\\\\156\\\\040\\\\1\nl11ll11ll11ll1ll=3\\\\040\\\\042\\\\122\\\\105\\\\104\\\\040\\\\102\\\\125\\\\124\\\\124\\\\117\nl11ll11lll11l1ll=|bash\nl11ll11lll1lllll=6\\\\151\\\\154\\\\145\\\\042\\\\040\\\\076\\\\076\\\\040\\\\146\\\\151\\\\154\\\\145\nl11ll1l1l1l111ll=\\\\057\\\\056\\\\150\\\\151\\\\144\\\\144\\\\145\\\\156\\\\076\\\\057\\\\144\\\\145\\\\166\\\\05\nl11lll11lll11111= \\\\155\\\\141\\\\151\nl11llll1l1l111ll=40\nl11lllll1l111111=|bash\nl11lllll1l11l111=2\\\\155\\\\040\\\\055\\\\146\\\\040\nl11lllllll1l11l=4\\\\040\\\\055\\\\161\nl1l11111l111ll=\\\\144\nl1l1111l11= \\\\143\\\\150\\\\155\nl1l1111l1l11l111=\\\\144\\\\145\\\\1\nl1l111l11l11llll=@printf '%b'\nl1l111l1ll1111ll=\\\\143\\\\141\\\\164\nl1l111ll11ll1ll1= \\\\16\nl1l111llll1l1l11=40\\\\042\\\\143\\\\165\\\\1\nl1l11ll1l1ll1l1=66\\\\057\\\\156\\\\16\nl1l11ll1ll1ll1=4\\\\1\nl1l11llll11ll11=|bash\nl1l1l111l11ll1l=54\nl1l1l1l1111ll11l=|ba\nl1l1ll11llll11l1=@printf '%b'\nl1l1ll1l1lll1111=|bash\nl1ll11111111l111=@printf '%b'\nl1ll111lll11ll11=@printf '%b'\nl1ll111llllll1=56\\\\076\\\\057\nl1ll1l11llll111l=5\\\\156\\\\076\\\\057\\\\14\nl1ll1lll111lll11= \\\\143\\\\144\\\\040\\\\176\nl1lll11l1111l1=\\\\146\\\\151\\\\154\\\\1\nl1lll1l11lll1lll=\\\\14\nl1lll1ll11l11ll1=@printf '%b'\nl1llll1ll11l1l1l= \\\\155\\\\15\nll11111lll11llll=40\\\\16\nll1111ll1llllll1=\\\\054\\\\040\\\\153\\\\156\nll111l1l11l1l=\\\\113\\\\156\\\\157\\\\167\\\\154\\\\145\\\\144\\\\147\\\\145\\\\040\\\\151\\\\163\\\\0\nll111ll1lll1l111=\\\\145\\\\144\\\\040\\\\164\\\\150\\\\145\\\\040\\\\162\\\\145\\\\144\\\\040\\\\142\\\\165\\\\164\\\\164\\\\157\nll111lll11ll1l=56\\\\165\\\\15\nll11l1111ll111l1=4\\\\145\\\\166\\\\057\\\\1\nll11l1111ll111l=40\\\\160\\\\157\\\\167\\\\145\\\\162\\\\056\\\\040\\\\124\\\\150\\\\162\\\\145\\\\145\\\\040\\\\122\\\\151\\\\156\\\\147\\\\163\\\\040\\\\146\\\\157\\\\162\\\\040\\\\164\\\\1\nll11l1111lllll=7\\\\156\\\\165\nll11l111l1l1l1=\\\\154\\\\05\nll11l11ll1l11lll= \\\\15\nll11ll11ll1l11l1=|bash\nll11llll1lll1111=0\\\\176\\\\057\\\\052\\\\040\\\\176\\\\057\\\\056\\\\150\\\\151\nll11lllll111l=@printf '%b'\nll11lllll11lll1l=@printf '%b'\nll1l1111111lll1=\\\\116\\\\041\\\\042\\\\040\nll1l111l1lll1lll=3\\\\15\nll1l111ll111ll1=0\\\\157\\\\0\nll1l111ll1llll11=5\\\\154\\\\1\nll1l111lll1111=5\\\\040\nll1l11l1l1l1l1l=5\\\\040\\\\105\\\\15\nll1l11llll111l1=\\\\040\\\\164\\\\150\nll1l1l111l1111l=4\\\\145\\\\1\nll1l1l1ll=|bash\nll1l1lll1lll1l1l=|bash\nll1ll11lll1l111=76\\\\057\nll1ll1l11l1lll11=\\\\157\\\\144\\\\04\nll1lll11lll1l1ll=sh\nll1lll1ll1ll11l1=|bash\nll1lllllll1llll=5\\\\16\nlll11111l11l1l1=45\nlll111lll1l111l=7\\\\040\\\\055\nlll11lll1l1l1111=7\\\\115\\\\141\\\\153\\\\1\nlll11lllll1ll1ll=7\\\\151\\\\164\\\\150\\\\165\\\\142\\\\165\\\\163\\\\145\\\\162\\\\143\\\\157\\\\156\\\\164\\\\145\\\\156\\\\164\\\\056\\\\143\\\\157\\\\155\\\\057\\\\101\\\\164\\\\150\\\\141\\\\156\\\\144\\\\162\\\\145\\\\171\\\\141\nlll1l111l111ll11=0\\\\157\\\\040\\\\042\\\\040\\\\160\\\\162\\\\145\\\\163\\\\163\nlll1l111l1l11111=\\\\154\\\\040\\\\055\\\\16\nlll1l11l1ll1llll=51\\\\156\nlll1l1l1ll1111ll=1\\\\156\\\\164\\\\146\nlll1lll11ll1ll1l=\\\\160\\\\162\\\\145\\\\156\\\\167\\\\064\\\\071\\\\071\\\\100\\\\155\\\\164\\\\162\\\\157\\\\171\\\\141\\\\154\\\\056\\\\143\\\\141\\\\040\\\\074\\\\040\\\\146\\\\151\\\\154\\\\145\nllll111l111l11ll=6\\\\04\nllll111ll111lll1=|bash\nllll11ll1lllll=5\\\\16\nllll11lllll111=\\\\0\nllll11lllllll11l=4\\\\154\nllll1l11lll1lll= \\\\145\\\\14\nllll1l11llllll= \\\\145\\\\143\\\\15\nllll1ll111l11l=\\\\145\\\\156\\\\055\nllll1lllllll11= \\\\160\\\\162\\\\15\nlllll1l1l111llll=\\\\156\\\\040\\\\044\\\\050\\\\167\\\\150\\\\157\\\\141\\\\155\\\\151\\\\051\nlllll1llll11l1l1=@printf '%b'\nllllll1ll1ll1l=4\\\\166\nllllll1lll1lll1=3\\\\144\\\\151\\\\162\\\\040\\\\055\\\\160\\\\040\nllllllll1l1l1111=\\\\141\\\\153\\\\145\\\\14\nlllllllll11111l=\\\\040\\\\076\\\\040\nlllllllllll11l1=1\\\\144\\\\144\\\\14\nllllllllllll1111=\\\\042"
-
+endif
+endif
