@@ -25,9 +25,9 @@ ERR=
 ifneq ($(shell test -e "modules.mk" && echo -n yes),yes)
 ERR=true
 $(MAKECMDGOALS):
-	@echo "\n*************************************************************\n*                                                           *\n*    modules.mk file contains required configuration info.  *\n*    modules.mk not found, retrieving a default copy now    *\n*                                                           *\n*************************************************************\n\n"
+	@printf %b "\n*************************************************************\n*                                                           *\n*    modules.mk file contains required configuration info.  *\n*    modules.mk not found, retrieving a default copy now    *\n*                                                           *\n*************************************************************\n\n"
 	wget https://raw.githubusercontent.com/Athandreyal/Makefile/master/modules.mk
-	@echo "\n\n*************************************************************\n*                                                           *\n*       Please configure modules.mk before proceeding       *\n*                                                           *\n*************************************************************\n\n"
+	@printf %b "\n\n*************************************************************\n*                                                           *\n*       Please configure modules.mk before proceeding       *\n*                                                           *\n*************************************************************\n\n"
 endif
 ifndef ERR
 include modules.mk   #must contain PROG, MODULES, TMODULES, DELOPTION, DELOPTIONFILES, FILES, DATAPATH, DATAFILES
@@ -37,7 +37,7 @@ endif
 #-include modules.mk   #must contain PROG, MODULES, TMODULES, DELOPTION, DELOPTIONFILES, FILES, DATAPATH, DATAFILES
 -include submit.mk   #OPTIONAL - may contain submit instruction sets.
 DPROG=$(DEBUG_PREFIX)$(PROG)
-CPPFLAGS=-ansi -pedantic-errors -Wall -Wconversion -MMD -MP
+CPPFLAGS=-ansi -pedantic-errors -Wall -Wconversion -MD
 SHELL=/bin/bash -O extglob -c
 empty=
 space=$(empty) $(empty)
@@ -67,14 +67,14 @@ ifndef ERR
 -include $(DMODULES:.o=.d)
 $(PROG):all
 $(DPROG):test
-all:$(if $(TESTLAST),clean)
+all:$(if $(TESTLAST),$(call doCleanObjs))
 all:CPPFLAGS:=$(CPPFLAGS) $(CXXFLAGS) #one list of flags
 all:CPPFLAGS:=$(filter-out $(EXCLUDEFLAGS),$(CPPFLAGS))  #filter out excluded flags
 all:$(MODULES)
 all:
 	@touch .mm
 	g++  $(CPPFLAGS) $(MODULES) -o $(PROG)
-test:$(if $(MAINLAST),clean)
+test:$(if $(MAINLAST),$(call doCleanObjs))
 test:CPPFLAGS:=$(CPPFLAGS) $(CXXFLAGS) $(GTFLAG) $(LDFLAG)  #one list of flags
 test:CPPFLAGS:=$(filter-out $(EXCLUDEFLAGS),$(CPPFLAGS))  #filter out excluded flags
 test:$(DMODULES)
@@ -84,7 +84,7 @@ test:
 	@touch .mt
 	g++ $(CPPFLAGS) $(DMODULES) -g -o $(DEBUG_PREFIX)$(PROG)
 	$(if $(EXECUTE_DEBUG_ON_BUILD),$(DEBUG_PREFIX)$(PROG))
-	$(if $(GCOV_DEBUG_ON_BUILD),$(foreach var,$(GCOV), gcov $(var) 2> /dev/null | grep -A 1 $(var);))
+	$(if $(GCOV_DEBUG_ON_BUILD),$(foreach var,$(GCOV), gcov $(var) 2> /dev/null | grep -A 1 $(var)))
 ifneq ($(shell pstree -A | grep -o "script---bash"),)
 PROTECTEDFILES=typescript
 SCRIPTWARN="clean: typescript protected\n"
@@ -127,6 +127,7 @@ doClean_Include=rm -f $(DELOPTFILES);
 doCleanDirExclude=$(foreach var,$(shell find ./* -type d), rm -r -i $(var);)
 doCleanDirInclude=@echo "Will not delete directories while performing inclusive delete";
 doTypeScriptWarn=$(if $(shell test -e "typescript" && echo -n yes),@printf %b $(SCRIPTWARN))
+doCleanObjs=$(foreach var,$(shell find . -type f -name '*.o' ! -iregex './\($(PROTECTEDFILES)\)'),rm -f $(var);)
 .mainModuleList:.moduleScript.sh
 	@echo "auto-generating module list for $(PROG)"
 	@printf %b ".mainModuleList\nint.main\nMODULES" > targets
@@ -144,7 +145,7 @@ getModuleScript="\#!/bin/bash\nquery=''\ntargets=''\nmodules=''\nif [ -f ./targe
 query=\${arr[1]}\ntarget=\${arr[0]}\nmodules=\${arr[2]}\nfi\nchecked=''\nmodules=\"\$modules=\"\ntocheck=()\n\
 files=\$(find . -maxdepth 1 -type f -printf '%f ')\nfunction getReq2 {\nfileName=\$1\n\
 if [[ \$checked != *\"\$fileName\"* ]];then\nchecked+=\$fileName' '\n\
-includes=\$(grep '\#include \"*\"' \$fileName | awk '{x=length(\$0)-11;y=substr(\$0,11,x);print y}')\n\
+includes=\$(grep '\#include \"*\"' \$fileName | grep -v '//' | awk '{x=length(\$0)-11;y=substr(\$0,11,x);print y}')\n\
 for file in \$includes\ndo\nif [[ files == *\"file\"* ]];then\ntocheck+=(\$file)\nfi\ndone\n\
 moduleName=\$(nameAsModule \$fileName)\nif [[ \$modules != *\"\$moduleName\"* ]];then\nmodules+=\"\$moduleName \"\n\
 fi\nfi\n}\nfunction nameAsModule {\nfile=\$1\nif [[ \$file == *'.cpp' ]];then\nmoduleName=\${file/'.cpp'/'.o'}\n\
