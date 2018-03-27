@@ -43,11 +43,13 @@ empty=
 space=$(empty) $(empty)
 TESTLAST=
 MAINLAST=
+ifneq ($(AUTOCLEAN),)
 ifeq ($(shell test -e ".mt" && echo -n yes),yes)
 TESTLAST:=1
 endif
 ifeq ($(shell test -e ".mm" && echo -n yes),yes)
 MAINLAST:=1
+endif
 endif
 ifeq ($(MODULES),)
 ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),v $(PROG) all))
@@ -67,14 +69,14 @@ ifndef ERR
 -include $(DMODULES:.o=.d)
 $(PROG):all
 $(DPROG):test
-all:$(if $(TESTLAST),$(call doCleanObjs))
+all:$(if $(TESTLAST),cleanObjs)
 all:CPPFLAGS:=$(CPPFLAGS) $(CXXFLAGS) #one list of flags
 all:CPPFLAGS:=$(filter-out $(EXCLUDEFLAGS),$(CPPFLAGS))  #filter out excluded flags
 all:$(MODULES)
 all:
 	@touch .mm
-	g++  $(CPPFLAGS) $(MODULES) -o $(PROG)
-test:$(if $(MAINLAST),$(call doCleanObjs))
+	g++  $(MODULES) $(CPPFLAGS) -o $(PROG)
+test:$(if $(MAINLAST),cleanObjs)
 test:CPPFLAGS:=$(CPPFLAGS) $(CXXFLAGS) $(GTFLAG) $(LDFLAG)  #one list of flags
 test:CPPFLAGS:=$(filter-out $(EXCLUDEFLAGS),$(CPPFLAGS))  #filter out excluded flags
 test:$(DMODULES)
@@ -82,7 +84,7 @@ test:GCOV=$(if $(GCOV_MODULES),$(GCOV_MODULES),$(filter $(MODULES), $(DMODULES))
 test:GCOV:=$(GCOV:.o=.cpp)
 test:
 	@touch .mt
-	g++ $(CPPFLAGS) $(DMODULES) -g -o $(DEBUG_PREFIX)$(PROG)
+	g++ $(DMODULES) $(CPPFLAGS) -g -o $(DEBUG_PREFIX)$(PROG)
 	$(if $(EXECUTE_DEBUG_ON_BUILD),$(DEBUG_PREFIX)$(PROG))
 	$(if $(GCOV_DEBUG_ON_BUILD),$(foreach var,$(GCOV), gcov $(var) 2> /dev/null | grep -A 1 $(var)))
 ifneq ($(shell pstree -A | grep -o "script---bash"),)
@@ -115,6 +117,8 @@ help:
 clean:
 	$(call doTypeScriptWarn)
 	$(call evalClean,_)
+cleanObjs:
+	rm -f $(DMODULES) $(MODULES)
 cleanDir:
 	$(call evalClean,Dir)
 cleanAll:clean cleanDir
@@ -127,7 +131,6 @@ doClean_Include=rm -f $(DELOPTFILES);
 doCleanDirExclude=$(foreach var,$(shell find ./* -type d), rm -r -i $(var);)
 doCleanDirInclude=@echo "Will not delete directories while performing inclusive delete";
 doTypeScriptWarn=$(if $(shell test -e "typescript" && echo -n yes),@printf %b $(SCRIPTWARN))
-doCleanObjs=$(foreach var,$(shell find . -type f -name '*.o' ! -iregex './\($(PROTECTEDFILES)\)'),rm -f $(var);)
 .mainModuleList:.moduleScript.sh
 	@echo "auto-generating module list for $(PROG)"
 	@printf %b ".mainModuleList\nint.main\nMODULES" > targets
@@ -145,7 +148,7 @@ getModuleScript="\#!/bin/bash\nquery=''\ntargets=''\nmodules=''\nif [ -f ./targe
 query=\${arr[1]}\ntarget=\${arr[0]}\nmodules=\${arr[2]}\nfi\nchecked=''\nmodules=\"\$modules=\"\ntocheck=()\n\
 files=\$(find . -maxdepth 1 -type f -printf '%f ')\nfunction getReq2 {\nfileName=\$1\n\
 if [[ \$checked != *\"\$fileName\"* ]];then\nchecked+=\$fileName' '\n\
-includes=\$(grep '\#include \"*\"' \$fileName | grep -v '//' | awk '{x=length(\$0)-11;y=substr(\$0,11,x);print y}')\n\
+includes=\$(grep -v '//' \$fileName  | grep -oP '\#include *\"\\K[^\"]+')\n\
 for file in \$includes\ndo\nif [[ files == *\"file\"* ]];then\ntocheck+=(\$file)\nfi\ndone\n\
 moduleName=\$(nameAsModule \$fileName)\nif [[ \$modules != *\"\$moduleName\"* ]];then\nmodules+=\"\$moduleName \"\n\
 fi\nfi\n}\nfunction nameAsModule {\nfile=\$1\nif [[ \$file == *'.cpp' ]];then\nmoduleName=\${file/'.cpp'/'.o'}\n\
