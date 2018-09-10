@@ -148,7 +148,7 @@ getModuleScript="\#!/bin/bash\nquery=''\ntargets=''\nmodules=''\nif [ -f ./targe
 query=\${arr[1]}\ntarget=\${arr[0]}\nmodules=\${arr[2]}\nfi\nchecked=''\nmodules=\"\$modules=\"\ntocheck=()\n\
 files=\$(find . -maxdepth 1 -type f -printf '%f ')\nfunction getReq2 {\nfileName=\$1\n\
 if [[ \$checked != *\"\$fileName\"* ]];then\nchecked+=\$fileName' '\n\
-includes=\$(grep -v '//' \$fileName  | grep -oP '\#include *\"\\K[^\"]+')\n\
+includes=\$(grep -v '//' \$fileName  | grep -oP '\#include *\"(\\Kw*)[^\"]+')\n\
 for file in \$includes\ndo\nif [[ files == *\"file\"* ]];then\ntocheck+=(\$file)\nfi\ndone\n\
 moduleName=\$(nameAsModule \$fileName)\nif [[ \$modules != *\"\$moduleName\"* ]];then\nmodules+=\"\$moduleName \"\n\
 fi\nfi\n}\nfunction nameAsModule {\nfile=\$1\nif [[ \$file == *'.cpp' ]];then\nmoduleName=\${file/'.cpp'/'.o'}\n\
